@@ -15,8 +15,10 @@ class SudokuGUI:
         self.screen.fill(pg.Color("white"))
         self.solver = Solver()
         self.font = pg.font.SysFont('Century Gothic', 35)
-        self.board = self.solver.generate_puzzle(self.solver.board)
-        self.og_puzzle = copy.deepcopy(self.board)
+        # generated puzzle board
+        # self.puzzle_board = self.solver.generate_puzzle(self.solver.board)
+        # saves puzzle before modification
+        # self.og_puzzle = copy.deepcopy(self.puzzle_board)
         self.selected_pos = None
         self.play_music()
 
@@ -33,26 +35,30 @@ class SudokuGUI:
                 if event.type == pg.QUIT:
                     return
                 if event.type == pg.KEYDOWN:
-                    if self.og_puzzle[i-1][j-1] != 0:
-                        return  # Exit if the cell is not editable
                     if (event.key == 48):  # 0 key
                         print("0 was pressed")
-                        self.board[i-1][j-1] = 0
+                        self.solver.board[i-1][j-1] = 0
                         pg.draw.rect(screen, 'white', (j * 50 + 5, i * 50 + 10, 50 - 10, 50 - 10))
                         pg.display.update()
                         return
                     if (0 < event.key - 48 < 10):  # any other valid input
                         print("key was pressed")
-                        self.board[i-1][j-1] = event.key - 48
+                        self.solver.board[i-1][j-1] = event.key - 48
                         pg.draw.rect(screen, 'white', (j * 50 + 5, i * 50 + 10, 50 - 10, 50 - 10))
                         value = self.font.render(str(event.key - 48), True, 'black')
                         screen.blit(value, (position[0] * 50 + 15, position[1] * 50 + 5))
                         pg.display.update()
-                        if event.key - 48 != self.solver.solved_board[i-1][j-1]:
-                            print("Incorrect")
-                        else:
-                            print("Correct")
+                        print(self.solver.board)
                         return
+
+    def display_solution(self, grid):
+        for i in range(self.solver.n):
+            for j in range(self.solver.n):
+                # render number to print
+                value = self.font.render(str(grid[i][j]), True, 'black')
+                # print it to screen at x, y coordinate
+                self.screen.blit(value, ((j + 1) * 50 + 15, (i + 1) * 50 + 5))
+        pg.display.update()
 
 
     def play_music(self):
@@ -87,11 +93,20 @@ class SudokuGUI:
                     pos = pg.mouse.get_pos()
                     self.selected_pos = (pos[0] // 50, pos[1] // 50)
                     self.input(self.screen, self.selected_pos)
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
+                        print("space was pressed")
+                        solved = self.solver.solve(self.solver.board)
+                        if solved:
+                            self.screen.fill(pg.Color("white"))
+                            self.display_solution(self.solver.board)
+                        else:
+                            print("Puzzle cannot be solved")
                 if event.type == pg.QUIT:
                     running = False
 
             self.draw_board()
-            self.print_values(self.board)
+            self.print_values(self.solver.board)
             # self.print_values()
             pg.display.flip()
             self.clock.tick(60)
