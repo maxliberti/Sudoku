@@ -22,11 +22,14 @@ class Solver:
             [0, 0, 0, 0, 0, 0, 0, 0, 0]
         ]
 
+        self.solved_board = []
+
     def debug(self):
         print(np.matrix(self.board))
 
     def generate_puzzle(self, grid):
-        self.solve(grid)
+        if self.solve(grid):
+            self.solved_board = [row[:] for row in grid]
         squares = self.n*self.n
         remove = squares * 3 // 4
         for i in sample(range(squares), remove):

@@ -28,8 +28,7 @@ class SudokuGUI:
     def input(self, screen, position):
         print(f"Input function called with position: {position}")
         i, j = position[1], position[0]
-        flag = True
-        while flag:
+        while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     return
@@ -39,16 +38,20 @@ class SudokuGUI:
                     if (event.key == 48):  # 0 key
                         print("0 was pressed")
                         self.board[i-1][j-1] = 0
-                        pg.draw.rect(screen, 'white', ((i-1) * 50 + 5, (j-1) * 50 + 10, 50 - 10, 50 - 10))
+                        pg.draw.rect(screen, 'white', (j * 50 + 5, i * 50 + 10, 50 - 10, 50 - 10))
                         pg.display.update()
                         return
                     if (0 < event.key - 48 < 10):  # any other valid input
                         print("key was pressed")
                         self.board[i-1][j-1] = event.key - 48
-                        pg.draw.rect(screen, 'white', ((i-1) * 50 + 5, (j-1) * 50 + 10, 50 - 10, 50 - 10))
+                        pg.draw.rect(screen, 'white', (j * 50 + 5, i * 50 + 10, 50 - 10, 50 - 10))
                         value = self.font.render(str(event.key - 48), True, 'black')
                         screen.blit(value, (position[0] * 50 + 15, position[1] * 50 + 5))
                         pg.display.update()
+                        if event.key - 48 != self.solver.solved_board[i-1][j-1]:
+                            print("Incorrect")
+                        else:
+                            print("Correct")
                         return
 
 
